@@ -53,6 +53,7 @@ namespace BitStream
 
         public byte ReadBit()
         {
+            stream.Seek(index, SeekOrigin.Begin);
             byte value;
             if (!bigEndian)
             {
@@ -74,10 +75,10 @@ namespace BitStream
         public byte[] ReadBits(long bits)
         {
             List<byte> data = new List<byte>();
-            for(long i=0;i< bits; )
+            for (long i = 0; i < bits;)
             {
                 byte value = 0;
-                for(int p=0;p<8 && i < bits; i++,p++)
+                for (int p = 0; p < 8 && i < bits; i++, p++)
                 {
                     if (!bigEndian)
                     {
@@ -85,7 +86,7 @@ namespace BitStream
                     }
                     else
                     {
-                        value |= (byte)(ReadBit() << (7-p));
+                        value |= (byte)(ReadBit() << (7 - p));
                     }
                 }
                 data.Add(value);
@@ -137,6 +138,19 @@ namespace BitStream
                 }
                 position++;
             }
+        }
+
+        public Stream GetStream()
+        {
+            return stream;
+        }
+
+        public byte[] GetStreamData()
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            MemoryStream s = new MemoryStream();
+            stream.CopyTo(s);
+            return s.ToArray();
         }
 
         public long Length
