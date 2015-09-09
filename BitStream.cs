@@ -187,55 +187,61 @@ namespace BitStream
 
         public short ReadInt16()
         {
-            bool b = bigEndian;
-            bigEndian = true;
             short value = BitConverter.ToInt16(ReadBits(16), 0);
-            bigEndian = b;
+            return value;
+        }
+
+        public int ReadInt24()
+        {
+            int value = BitConverter.ToInt32(ReadBits(24), 0);
             return value;
         }
 
         public int ReadInt32()
         {
-            bool b = bigEndian;
-            bigEndian = true;
-            int value = BitConverter.ToInt32(ReadBits(16), 0);
-            bigEndian = b;
+            int value = BitConverter.ToInt32(ReadBits(32), 0);
+            return value;
+        }
+
+        public long ReadInt48()
+        {
+            long value = BitConverter.ToInt64(ReadBits(48), 0);
             return value;
         }
 
         public long ReadInt64()
         {
-            bool b = bigEndian;
-            bigEndian = true;
-            long value = BitConverter.ToInt64(ReadBits(16), 0);
-            bigEndian = b;
+            long value = BitConverter.ToInt64(ReadBits(64), 0);
             return value;
         }
 
         public ushort ReadUInt16()
         {
-            bool b = bigEndian;
-            bigEndian = false;
             ushort value = BitConverter.ToUInt16(ReadBits(16), 0);
-            bigEndian = b;
+            return value;
+        }
+
+        public uint ReadUInt24()
+        {
+            uint value = BitConverter.ToUInt16(ReadBits(24), 0);
             return value;
         }
 
         public uint ReadUInt32()
         {
-            bool b = bigEndian;
-            bigEndian = false;
-            uint value = BitConverter.ToUInt32(ReadBits(16), 0);
-            bigEndian = b;
+            uint value = BitConverter.ToUInt32(ReadBits(32), 0);
+            return value;
+        }
+
+        public ulong ReadUInt48()
+        {
+            ulong value = BitConverter.ToUInt64(ReadBits(48), 0);
             return value;
         }
 
         public ulong ReadUInt64()
         {
-            bool b = bigEndian;
-            bigEndian = false;
-            ulong value = BitConverter.ToUInt64(ReadBits(16), 0);
-            bigEndian = b;
+            ulong value = BitConverter.ToUInt64(ReadBits(64), 0);
             return value;
         }
 
