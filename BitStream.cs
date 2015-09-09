@@ -14,6 +14,16 @@ namespace BitStream
         private bool bigEndian { get; set; }
         private Stream stream;
 
+        public long Length
+        {
+            get
+            {
+                return stream.Length;
+            }
+        }
+
+        #region Constructors
+
         public BitStream(Stream stream, bool bigEndian = false)
         {
             this.stream = stream;
@@ -29,6 +39,10 @@ namespace BitStream
             index = 0;
             bit = 0;
         }
+
+        #endregion
+
+        #region Methods
 
         public void Seek(long index, int bit)
         {
@@ -50,6 +64,23 @@ namespace BitStream
             }
             stream.Seek(index, SeekOrigin.Begin);
         }
+
+        public Stream GetStream()
+        {
+            return stream;
+        }
+
+        public byte[] GetStreamData()
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            MemoryStream s = new MemoryStream();
+            stream.CopyTo(s);
+            return s.ToArray();
+        }
+
+        #endregion
+
+        #region BitRead/Write
 
         public byte ReadBit()
         {
@@ -140,25 +171,137 @@ namespace BitStream
             }
         }
 
-        public Stream GetStream()
+        #endregion
+
+        #region Read
+
+        public byte ReadByte()
         {
-            return stream;
+            return ReadBits(8)[0];
         }
 
-        public byte[] GetStreamData()
+        public bool ReadBool()
         {
-            stream.Seek(0, SeekOrigin.Begin);
-            MemoryStream s = new MemoryStream();
-            stream.CopyTo(s);
-            return s.ToArray();
+            return ReadBits(8)[0] == 0 ? false : true;
         }
 
-        public long Length
+        public short ReadInt16()
         {
-            get
-            {
-                return stream.Length;
-            }
+            bool b = bigEndian;
+            bigEndian = true;
+            short value = BitConverter.ToInt16(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
         }
+
+        public int ReadInt32()
+        {
+            bool b = bigEndian;
+            bigEndian = true;
+            int value = BitConverter.ToInt32(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
+        }
+
+        public long ReadInt64()
+        {
+            bool b = bigEndian;
+            bigEndian = true;
+            long value = BitConverter.ToInt64(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
+        }
+
+        public ushort ReadUInt16()
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            ushort value = BitConverter.ToUInt16(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
+        }
+
+        public uint ReadUInt32()
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            uint value = BitConverter.ToUInt32(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
+        }
+
+        public ulong ReadUInt64()
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            ulong value = BitConverter.ToUInt64(ReadBits(16), 0);
+            bigEndian = b;
+            return value;
+        }
+
+        #endregion
+
+        #region Write
+
+        public void WriteByte(byte value)
+        {
+            WriteBits(new byte[] { value }, 8);
+        }
+
+        public void WriteBool(bool value)
+        {
+            WriteBits(new byte[] { value ? (byte)1 : (byte)0 }, 8);
+        }
+
+        public void WriteInt16(short value)
+        {
+            bool b = bigEndian;
+            bigEndian = true;
+            WriteBits(BitConverter.GetBytes(value), 16);
+            bigEndian = b;
+        }
+
+        public void WriteInt32(int value)
+        {
+            bool b = bigEndian;
+            bigEndian = true;
+            WriteBits(BitConverter.GetBytes(value), 32);
+            bigEndian = b;
+        }
+
+        public void WriteInt64(long value)
+        {
+            bool b = bigEndian;
+            bigEndian = true;
+            WriteBits(BitConverter.GetBytes(value), 64);
+            bigEndian = b;
+        }
+
+        public void WriteUInt16(ushort value)
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            WriteBits(BitConverter.GetBytes(value), 16);
+            bigEndian = b;
+        }
+
+        public void WriteUInt32(uint value)
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            WriteBits(BitConverter.GetBytes(value), 32);
+            bigEndian = b;
+        }
+
+        public void WriteUInt64(ulong value)
+        {
+            bool b = bigEndian;
+            bigEndian = false;
+            WriteBits(BitConverter.GetBytes(value), 64);
+            bigEndian = b;
+        }
+
+        #endregion
+
     }
 }
