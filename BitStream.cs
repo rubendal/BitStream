@@ -261,50 +261,52 @@ namespace BitStream
 
         public void WriteInt16(short value)
         {
-            bool b = bigEndian;
-            bigEndian = true;
             WriteBits(BitConverter.GetBytes(value), 16);
-            bigEndian = b;
+        }
+
+        public void WriteInt24(int value)
+        {
+            WriteBits(BitConverter.GetBytes(value), 24);
         }
 
         public void WriteInt32(int value)
         {
-            bool b = bigEndian;
-            bigEndian = true;
             WriteBits(BitConverter.GetBytes(value), 32);
-            bigEndian = b;
+        }
+
+        public void WriteInt48(long value)
+        {
+            WriteBits(BitConverter.GetBytes(value), 48);
         }
 
         public void WriteInt64(long value)
         {
-            bool b = bigEndian;
-            bigEndian = true;
             WriteBits(BitConverter.GetBytes(value), 64);
-            bigEndian = b;
         }
 
         public void WriteUInt16(ushort value)
         {
-            bool b = bigEndian;
-            bigEndian = false;
             WriteBits(BitConverter.GetBytes(value), 16);
-            bigEndian = b;
+        }
+
+        public void WriteUInt24(uint value)
+        {
+            WriteBits(BitConverter.GetBytes(value), 24);
         }
 
         public void WriteUInt32(uint value)
         {
-            bool b = bigEndian;
-            bigEndian = false;
             WriteBits(BitConverter.GetBytes(value), 32);
-            bigEndian = b;
+        }
+
+        public void WriteUInt48(ulong value)
+        {
+            WriteBits(BitConverter.GetBytes(value), 48);
         }
 
         public void WriteUInt64(ulong value)
         {
-            bool b = bigEndian;
-            bigEndian = false;
             WriteBits(BitConverter.GetBytes(value), 64);
-            bigEndian = b;
         }
 
         #endregion
