@@ -3,10 +3,11 @@ Stream wrapper to read/write bits and other data types
 
 ## Introduction
 Bitstreams unlike streams using `BinaryReader` and `BinaryWriter` use the stream at bit level, allowing read/write bits
+
 This library project attempts to add bit manipulation to a stream while using known `Stream`, `BinaryReader` and `BinaryWriter` class methods
 
 ## Usage
-Initialize a **BitStream** using a Stream or `byte[]` using the constructor
+Initialize a **BitStream** using a Stream or `byte[]` int the constructor
 ```
 //Using Stream stream;
 BitStream bitstream = new BitStream(stream);
@@ -67,4 +68,4 @@ Just like `BinaryReader` and `BinaryWriter` can read/write data types like int, 
 **BitStream** can do bitwise operations `AND`,`OR`,`XOR` and `NOT` at byte and bit level
 
 ## NuGet
-https://www.nuget.org/packages/rubendal.BitStream
+NuGet package is available here https://www.nuget.org/packages/rubendal.BitStream
