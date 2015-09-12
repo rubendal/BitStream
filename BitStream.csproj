@@ -7,8 +7,8 @@
     <ProjectGuid>{7F9B3E21-7824-4F77-9F6C-A9D31E3204D5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BitStreamLib</RootNamespace>
-    <AssemblyName>BitStreamLib</AssemblyName>
+    <RootNamespace>BitStreams</RootNamespace>
+    <AssemblyName>BitStreams</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
