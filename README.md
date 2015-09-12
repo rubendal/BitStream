@@ -1,5 +1,5 @@
 # BitStream
-C# .NET library to read/write bitstreams
+Stream wrapper to read/write bits and other data types
 
 ## Introduction
 Bitstreams unlike streams using `BinaryReader` and `BinaryWriter` use the stream at bit level, allowing read/write bits
@@ -65,3 +65,6 @@ Just like `BinaryReader` and `BinaryWriter` can read/write data types like int, 
 
 ### Bitwise Operators
 **BitStream** can do bitwise operations `AND`,`OR`,`XOR` and `NOT` at byte and bit level
+
+## NuGet
+https://www.nuget.org/packages/rubendal.BitStream
