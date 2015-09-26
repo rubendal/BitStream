@@ -276,8 +276,8 @@ namespace BitStreams
         {
             long o = offset;
             int b = bit;
-            bit = (bit + 1) % 8;
-            if (bit == 0)
+            b = (b + 1) % 8;
+            if (b == 0)
             {
                 o++;
             }
