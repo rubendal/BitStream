@@ -57,7 +57,7 @@ bitstream.WriteBit(i);
 bitstream.WriteBit(true);
 ```
 
-**BitStream** can also read/write arrays of Bits with *ReadBits(int count)* and *WriteBits(Bit[] bits)* methods
+**BitStream** can also read/write arrays of Bits with *ReadBits(int length)* and *WriteBits(Bit[] bits)* methods
 
 ### Reading/Writing data types
 Just like `BinaryReader` and `BinaryWriter` can read/write data types like int, bool and string, **BitStream** can read/write this data types, currently these are supported:
