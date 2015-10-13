@@ -7,6 +7,9 @@ using System.IO;
 
 namespace BitStreams
 {
+    /// <summary>
+    /// Stream wrapper to use bit-level operations
+    /// </summary>
     public class BitStream
     {
         private long offset { get; set; }
@@ -382,7 +385,7 @@ namespace BitStreams
             foreach(Bit b in bits)
             {
                 WriteBit(b);
-            }
+            }            
         }
 
         /// <summary>
@@ -531,9 +534,11 @@ namespace BitStreams
         /// <summary>
         /// Read a 24bit value based on the current stream and bit position
         /// </summary>
-        public int ReadInt24()
+        public Int24 ReadInt24()
         {
-            int value = BitConverter.ToInt32(ReadBytes(24), 0);
+            byte[] bytes = ReadBytes(24);
+            Array.Resize(ref bytes, 4);
+            Int24 value = BitConverter.ToInt32(bytes, 0);
             return value;
         }
 
@@ -549,9 +554,11 @@ namespace BitStreams
         /// <summary>
         /// Read a 48bit value based on the current stream and bit position
         /// </summary>
-        public long ReadInt48()
+        public Int48 ReadInt48()
         {
-            long value = BitConverter.ToInt64(ReadBytes(48), 0);
+            byte[] bytes = ReadBytes(48);
+            Array.Resize(ref bytes, 8);
+            Int48 value = BitConverter.ToInt64(bytes, 0);
             return value;
         }
 
@@ -576,9 +583,11 @@ namespace BitStreams
         /// <summary>
         /// Read an unsigned 24bit value based on the current stream and bit position
         /// </summary>
-        public uint ReadUInt24()
+        public UInt24 ReadUInt24()
         {
-            uint value = BitConverter.ToUInt16(ReadBytes(24), 0);
+            byte[] bytes = ReadBytes(24);
+            Array.Resize(ref bytes, 4);
+            UInt24 value = BitConverter.ToUInt32(bytes, 0);
             return value;
         }
 
@@ -594,9 +603,11 @@ namespace BitStreams
         /// <summary>
         /// Read an unsigned 48bit value based on the current stream and bit position
         /// </summary>
-        public ulong ReadUInt48()
+        public UInt48 ReadUInt48()
         {
-            ulong value = BitConverter.ToUInt64(ReadBytes(48), 0);
+            byte[] bytes = ReadBytes(48);
+            Array.Resize(ref bytes, 8);
+            UInt48 value = BitConverter.ToUInt64(bytes, 0);
             return value;
         }
 
@@ -725,7 +736,7 @@ namespace BitStreams
         /// <summary>
         /// Write a 24bit value based on the current stream and bit position
         /// </summary>
-        public void WriteInt24(int value)
+        public void WriteInt24(Int24 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 24);
         }
@@ -741,7 +752,7 @@ namespace BitStreams
         /// <summary>
         /// Write a 48bit value based on the current stream and bit position
         /// </summary>
-        public void WriteInt48(long value)
+        public void WriteInt48(Int48 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 48);
         }
@@ -765,7 +776,7 @@ namespace BitStreams
         /// <summary>
         /// Write an unsigned 24bit value based on the current stream and bit position
         /// </summary>
-        public void WriteUInt24(uint value)
+        public void WriteUInt24(UInt24 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 24);
         }
@@ -781,7 +792,7 @@ namespace BitStreams
         /// <summary>
         /// Write an unsigned 48bit value based on the current stream and bit position
         /// </summary>
-        public void WriteUInt48(ulong value)
+        public void WriteUInt48(UInt48 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 48);
         }
