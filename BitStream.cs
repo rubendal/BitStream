@@ -253,7 +253,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Changes the length of the stream
+        /// Changes the length of the stream, if new length is less than current length stream data will be truncated
         /// </summary>
         /// <param name="length">New stream length</param>
         /// <returns>return true if stream changed length, false if it wasn't possible</returns>
@@ -268,6 +268,44 @@ namespace BitStreams
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Cuts the <see cref="BitStream"/> from the specified offset and given length, will throw an exception when length + offset is higher than stream's length
+        /// </summary>
+        /// <param name="offset">Offset to start</param>
+        /// <param name="length">Length of the new <see cref="BitStream"/></param>
+        public void CutStream(long offset, long length)
+        {
+            byte[] data = GetStreamData();
+            byte[] buffer = new byte[length];
+            Array.Copy(data, offset, buffer, 0, length);
+            this.stream = new MemoryStream();
+            MemoryStream m = new MemoryStream(buffer);
+            this.stream = new MemoryStream();
+            m.CopyTo(this.stream);
+            this.offset = 0;
+            bit = 0;
+        }
+
+        /// <summary>
+        /// Copies the current <see cref="BitStream"/> buffer to another <see cref="Stream"/>
+        /// </summary>
+        /// <param name="stream"><see cref="Stream"/> to copy buffer</param>
+        public void CopyStreamTo(Stream stream)
+        {
+            Seek(0, 0);
+            stream.SetLength(this.stream.Length);
+            this.stream.CopyTo(stream);
+        }
+
+        /// <summary>
+        /// Saves current <see cref="BitStream"/> buffer into a file
+        /// </summary>
+        /// <param name="filename">File to write data, if it exists it will be overwritten</param>
+        public void SaveStreamAsFile(string filename)
+        {
+            File.WriteAllBytes(filename, GetStreamData());
         }
 
         /// <summary>
@@ -286,6 +324,8 @@ namespace BitStreams
             }
             return o < Length;
         }
+
+
 
         #endregion
 
@@ -446,6 +486,11 @@ namespace BitStreams
                 data.Add(value);
             }
             return data.ToArray();
+        }
+
+        public byte[] ReadBytes(int bytes, bool isBytes)
+        {
+            return ReadBytes(bytes * 8);
         }
 
         /// <summary>
@@ -649,6 +694,11 @@ namespace BitStreams
                 }
                 position++;
             }
+        }
+
+        public void WriteBytes(byte[] data, int length, bool asBytes)
+        {
+            WriteBytes(data, length * 8);
         }
 
         /// <summary>
