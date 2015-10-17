@@ -462,17 +462,22 @@ namespace BitStreams
         #region Read
 
         /// <summary>
-        /// Read from the current position bit the specified number of bits and creates a byte[] 
+        /// Read from the current position bit the specified number of bits or bytes and creates a byte[] 
         /// </summary>
-        /// <param name="bits">Number of bits</param>
+        /// <param name="length">Number of bits or bytes</param>
+        /// <param name="isBytes">if true will consider length as byte length, if false it will count the specified length of bits</param>
         /// <returns>byte[] containing bytes created from current position</returns>
-        public byte[] ReadBytes(long bits)
+        public byte[] ReadBytes(long length, bool isBytes = false)
         {
+            if (isBytes)
+            {
+                length *= 8;
+            }
             List<byte> data = new List<byte>();
-            for (long i = 0; i < bits;)
+            for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < bits; i++, p++)
+                for (int p = 0; p < 8 && i < length; i++, p++)
                 {
                     if (!MSB)
                     {
@@ -486,11 +491,6 @@ namespace BitStreams
                 data.Add(value);
             }
             return data.ToArray();
-        }
-
-        public byte[] ReadBytes(int bytes, bool isBytes)
-        {
-            return ReadBytes(bytes * 8);
         }
 
         /// <summary>
@@ -670,17 +670,18 @@ namespace BitStreams
         #region Write
 
         /// <summary>
-        /// Writes as bits a byte[] by a specified number of bits
+        /// Writes as bits a byte[] by a specified number of bits or bytes
         /// </summary>
         /// <param name="data">byte[] to write</param>
-        /// <param name="bits">Number of bits to use from the array</param>
-        public void WriteBytes(byte[] data, long bits)
+        /// <param name="length">Number of bits or bytes to use from the array</param>
+        /// <param name="isBytes">if true will consider length as byte length, if false it will count the specified length of bits</param>
+        public void WriteBytes(byte[] data, long length, bool isBytes = false)
         {
             int position = 0;
-            for (long i = 0; i < bits;)
+            for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < bits; i++, p++)
+                for (int p = 0; p < 8 && i < length; i++, p++)
                 {
                     if (!MSB)
                     {
@@ -694,11 +695,6 @@ namespace BitStreams
                 }
                 position++;
             }
-        }
-
-        public void WriteBytes(byte[] data, int length, bool asBytes)
-        {
-            WriteBytes(data, length * 8);
         }
 
         /// <summary>
