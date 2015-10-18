@@ -7,6 +7,9 @@ using System.IO;
 
 namespace BitStreams
 {
+    /// <summary>
+    /// Stream wrapper to use bit-level operations
+    /// </summary>
     public class BitStream
     {
         private long offset { get; set; }
@@ -250,7 +253,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Changes the length of the stream
+        /// Changes the length of the stream, if new length is less than current length stream data will be truncated
         /// </summary>
         /// <param name="length">New stream length</param>
         /// <returns>return true if stream changed length, false if it wasn't possible</returns>
@@ -265,6 +268,56 @@ namespace BitStreams
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Cuts the <see cref="BitStream"/> from the specified offset and given length, will throw an exception when length + offset is higher than stream's length, offset and bit will be set to 0
+        /// </summary>
+        /// <param name="offset">Offset to start</param>
+        /// <param name="length">Length of the new <see cref="BitStream"/></param>
+        public void CutStream(long offset, long length)
+        {
+            byte[] data = GetStreamData();
+            byte[] buffer = new byte[length];
+            Array.Copy(data, offset, buffer, 0, length);
+            this.stream = new MemoryStream();
+            MemoryStream m = new MemoryStream(buffer);
+            this.stream = new MemoryStream();
+            m.CopyTo(this.stream);
+            this.offset = 0;
+            bit = 0;
+        }
+
+        /// <summary>
+        /// Copies the current <see cref="BitStream"/> buffer to another <see cref="Stream"/>
+        /// </summary>
+        /// <param name="stream"><see cref="Stream"/> to copy buffer</param>
+        public void CopyStreamTo(Stream stream)
+        {
+            Seek(0, 0);
+            stream.SetLength(this.stream.Length);
+            this.stream.CopyTo(stream);
+        }
+
+        /// <summary>
+        /// Copies the current <see cref="BitStream"/> buffer to another <see cref="BitStream"/>
+        /// </summary>
+        /// <param name="stream"><see cref="BitStream"/> to copy buffer</param>
+        public void CopyStreamTo(BitStream stream)
+        {
+            Seek(0, 0);
+            stream.ChangeLength(this.stream.Length);
+            this.stream.CopyTo(stream.stream);
+            stream.Seek(0, 0);
+        }
+
+        /// <summary>
+        /// Saves current <see cref="BitStream"/> buffer into a file
+        /// </summary>
+        /// <param name="filename">File to write data, if it exists it will be overwritten</param>
+        public void SaveStreamAsFile(string filename)
+        {
+            File.WriteAllBytes(filename, GetStreamData());
         }
 
         /// <summary>
@@ -283,6 +336,7 @@ namespace BitStreams
             }
             return o < Length;
         }
+
 
         #endregion
 
@@ -382,7 +436,7 @@ namespace BitStreams
             foreach(Bit b in bits)
             {
                 WriteBit(b);
-            }
+            }            
         }
 
         /// <summary>
@@ -419,17 +473,22 @@ namespace BitStreams
         #region Read
 
         /// <summary>
-        /// Read from the current position bit the specified number of bits and creates a byte[] 
+        /// Read from the current position bit the specified number of bits or bytes and creates a byte[] 
         /// </summary>
-        /// <param name="bits">Number of bits</param>
+        /// <param name="length">Number of bits or bytes</param>
+        /// <param name="isBytes">if true will consider length as byte length, if false it will count the specified length of bits</param>
         /// <returns>byte[] containing bytes created from current position</returns>
-        public byte[] ReadBytes(long bits)
+        public byte[] ReadBytes(long length, bool isBytes = false)
         {
+            if (isBytes)
+            {
+                length *= 8;
+            }
             List<byte> data = new List<byte>();
-            for (long i = 0; i < bits;)
+            for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < bits; i++, p++)
+                for (int p = 0; p < 8 && i < length; i++, p++)
                 {
                     if (!MSB)
                     {
@@ -531,9 +590,11 @@ namespace BitStreams
         /// <summary>
         /// Read a 24bit value based on the current stream and bit position
         /// </summary>
-        public int ReadInt24()
+        public Int24 ReadInt24()
         {
-            int value = BitConverter.ToInt32(ReadBytes(24), 0);
+            byte[] bytes = ReadBytes(24);
+            Array.Resize(ref bytes, 4);
+            Int24 value = BitConverter.ToInt32(bytes, 0);
             return value;
         }
 
@@ -549,9 +610,11 @@ namespace BitStreams
         /// <summary>
         /// Read a 48bit value based on the current stream and bit position
         /// </summary>
-        public long ReadInt48()
+        public Int48 ReadInt48()
         {
-            long value = BitConverter.ToInt64(ReadBytes(48), 0);
+            byte[] bytes = ReadBytes(48);
+            Array.Resize(ref bytes, 8);
+            Int48 value = BitConverter.ToInt64(bytes, 0);
             return value;
         }
 
@@ -576,9 +639,11 @@ namespace BitStreams
         /// <summary>
         /// Read an unsigned 24bit value based on the current stream and bit position
         /// </summary>
-        public uint ReadUInt24()
+        public UInt24 ReadUInt24()
         {
-            uint value = BitConverter.ToUInt16(ReadBytes(24), 0);
+            byte[] bytes = ReadBytes(24);
+            Array.Resize(ref bytes, 4);
+            UInt24 value = BitConverter.ToUInt32(bytes, 0);
             return value;
         }
 
@@ -594,9 +659,11 @@ namespace BitStreams
         /// <summary>
         /// Read an unsigned 48bit value based on the current stream and bit position
         /// </summary>
-        public ulong ReadUInt48()
+        public UInt48 ReadUInt48()
         {
-            ulong value = BitConverter.ToUInt64(ReadBytes(48), 0);
+            byte[] bytes = ReadBytes(48);
+            Array.Resize(ref bytes, 8);
+            UInt48 value = BitConverter.ToUInt64(bytes, 0);
             return value;
         }
 
@@ -614,17 +681,18 @@ namespace BitStreams
         #region Write
 
         /// <summary>
-        /// Writes as bits a byte[] by a specified number of bits
+        /// Writes as bits a byte[] by a specified number of bits or bytes
         /// </summary>
         /// <param name="data">byte[] to write</param>
-        /// <param name="bits">Number of bits to use from the array</param>
-        public void WriteBytes(byte[] data, long bits)
+        /// <param name="length">Number of bits or bytes to use from the array</param>
+        /// <param name="isBytes">if true will consider length as byte length, if false it will count the specified length of bits</param>
+        public void WriteBytes(byte[] data, long length, bool isBytes = false)
         {
             int position = 0;
-            for (long i = 0; i < bits;)
+            for (long i = 0; i < length;)
             {
                 byte value = 0;
-                for (int p = 0; p < 8 && i < bits; i++, p++)
+                for (int p = 0; p < 8 && i < length; i++, p++)
                 {
                     if (!MSB)
                     {
@@ -725,7 +793,7 @@ namespace BitStreams
         /// <summary>
         /// Write a 24bit value based on the current stream and bit position
         /// </summary>
-        public void WriteInt24(int value)
+        public void WriteInt24(Int24 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 24);
         }
@@ -741,7 +809,7 @@ namespace BitStreams
         /// <summary>
         /// Write a 48bit value based on the current stream and bit position
         /// </summary>
-        public void WriteInt48(long value)
+        public void WriteInt48(Int48 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 48);
         }
@@ -765,7 +833,7 @@ namespace BitStreams
         /// <summary>
         /// Write an unsigned 24bit value based on the current stream and bit position
         /// </summary>
-        public void WriteUInt24(uint value)
+        public void WriteUInt24(UInt24 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 24);
         }
@@ -781,7 +849,7 @@ namespace BitStreams
         /// <summary>
         /// Write an unsigned 48bit value based on the current stream and bit position
         /// </summary>
-        public void WriteUInt48(ulong value)
+        public void WriteUInt48(UInt48 value)
         {
             WriteBytes(BitConverter.GetBytes(value), 48);
         }

@@ -5,13 +5,14 @@ using System.Text;
 
 namespace BitStreams
 {
-    public class Bit
+    [Serializable]
+    public struct Bit
     {
-        private int value;
+        private byte value;
 
         private Bit(int value)
         {
-            this.value = value & 1;
+            this.value = (byte)(value & 1);
         }
 
         public static implicit operator Bit(int value)
