@@ -308,6 +308,7 @@ namespace BitStreams
             Seek(0, 0);
             stream.ChangeLength(this.stream.Length);
             this.stream.CopyTo(stream.stream);
+            stream.Seek(0, 0);
         }
 
         /// <summary>
@@ -335,7 +336,6 @@ namespace BitStreams
             }
             return o < Length;
         }
-
 
 
         #endregion
