@@ -33,6 +33,11 @@ namespace BitStreams
             int value = (i.b0 | (i.b1 << 8) | (i.b2 << 16));
             return -(i.sign << 23) + value;
         }
+
+        public Bit GetBit(int index)
+        {
+            return (this >> index);
+        }
     }
 
     /// <summary>
@@ -58,6 +63,11 @@ namespace BitStreams
         public static implicit operator uint (UInt24 i)
         {
             return (uint)(i.b0 | (i.b1 << 8) | (i.b2 << 16));
+        }
+
+        public Bit GetBit(int index)
+        {
+            return (byte)(this >> index);
         }
     }
 }

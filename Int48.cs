@@ -35,6 +35,11 @@ namespace BitStreams
             long value = i.b0 + (i.b1 << 8) + (i.b2 << 16) + ((long)i.b3 << 24) + ((long)i.b4 << 32) + ((long)i.b5 << 40);
             return -((long)i.sign << 47) + value;
         }
+
+        public Bit GetBit(int index)
+        {
+            return (byte)(this >> index);
+        }
     }
 
     /// <summary>
@@ -64,6 +69,11 @@ namespace BitStreams
         {
             ulong value = (i.b0 + ((ulong)i.b1 << 8) + ((ulong)i.b2 << 16) + ((ulong)i.b3 << 24) + ((ulong)i.b4 << 32) + ((ulong)i.b5 << 40));
             return value;
+        }
+
+        public Bit GetBit(int index)
+        {
+            return (byte)(this >> index);
         }
     }
 }

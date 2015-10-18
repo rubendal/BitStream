@@ -271,7 +271,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Cuts the <see cref="BitStream"/> from the specified offset and given length, will throw an exception when length + offset is higher than stream's length
+        /// Cuts the <see cref="BitStream"/> from the specified offset and given length, will throw an exception when length + offset is higher than stream's length, offset and bit will be set to 0
         /// </summary>
         /// <param name="offset">Offset to start</param>
         /// <param name="length">Length of the new <see cref="BitStream"/></param>
@@ -297,6 +297,17 @@ namespace BitStreams
             Seek(0, 0);
             stream.SetLength(this.stream.Length);
             this.stream.CopyTo(stream);
+        }
+
+        /// <summary>
+        /// Copies the current <see cref="BitStream"/> buffer to another <see cref="BitStream"/>
+        /// </summary>
+        /// <param name="stream"><see cref="BitStream"/> to copy buffer</param>
+        public void CopyStreamTo(BitStream stream)
+        {
+            Seek(0, 0);
+            stream.ChangeLength(this.stream.Length);
+            this.stream.CopyTo(stream.stream);
         }
 
         /// <summary>
