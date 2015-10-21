@@ -688,6 +688,10 @@ namespace BitStreams
         /// <param name="isBytes">if true will consider length as byte length, if false it will count the specified length of bits</param>
         public void WriteBytes(byte[] data, long length, bool isBytes = false)
         {
+            if (isBytes)
+            {
+                length *= 8;
+            }
             int position = 0;
             for (long i = 0; i < length;)
             {
