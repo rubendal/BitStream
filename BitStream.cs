@@ -137,6 +137,17 @@ namespace BitStreams
         }
 
         /// <summary>
+        /// Creates a <see cref="BitStream"/> using a byte[]
+        /// </summary>
+        /// <param name="buffer">byte[] to use</param>
+        /// <param name="encoding">Encoding to use with chars/param>
+        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public static BitStream Create(byte[] buffer, Encoding encoding, bool MSB = false)
+        {
+            return new BitStream(buffer, encoding, MSB);
+        }
+
+        /// <summary>
         /// Creates a <see cref="BitStream"/> using a file path, throws IOException if file doesn't exists or path is not a file
         /// </summary>
         /// <param name="path">File path</param>
