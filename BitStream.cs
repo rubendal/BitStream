@@ -59,7 +59,7 @@ namespace BitStreams
         #region Constructors
 
         /// <summary>
-        /// Creates a BitStream using a Stream
+        /// Creates a <see cref="BitStream"/> using a Stream
         /// </summary>
         /// <param name="stream">Stream to use</param>
         /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
@@ -75,7 +75,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Creates a BitStream using a Stream
+        /// Creates a <see cref="BitStream"/> using a Stream
         /// </summary>
         /// <param name="stream">Stream to use</param>
         /// <param name="encoding">Encoding to use with chars</param>
@@ -92,7 +92,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Creates a BitStream using a byte[]
+        /// Creates a <see cref="BitStream"/> using a byte[]
         /// </summary>
         /// <param name="buffer">byte[] to use</param>
         /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
@@ -109,7 +109,7 @@ namespace BitStreams
         }
 
         /// <summary>
-        /// Creates a BitStream using a byte[]
+        /// Creates a <see cref="BitStream"/> using a byte[]
         /// </summary>
         /// <param name="buffer">byte[] to use</param>
         /// <param name="encoding">Encoding to use with chars</param>
@@ -124,6 +124,39 @@ namespace BitStreams
             bit = 0;
             this.encoding = encoding;
             AutoIncreaseStream = false;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="BitStream"/> using a byte[]
+        /// </summary>
+        /// <param name="buffer">byte[] to use</param>
+        /// <param name="MSB">true if Most Significant Bit will be used, if false LSB will be used</param>
+        public static BitStream Create(byte[] buffer, bool MSB = false)
+        {
+            return new BitStream(buffer, MSB);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="BitStream"/> using a file path, throws IOException if file doesn't exists or path is not a file
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="encoding">Encoding of the file, if null default <see cref="Encoding"/> will be used</param>
+        /// <returns></returns>
+        public static BitStream CreateFromFile(string path, Encoding encoding = null)
+        {
+            if (!File.Exists(path))
+            {
+                throw new IOException("File doesn't exists!");
+            }
+            if(File.GetAttributes(path) == FileAttributes.Directory)
+            {
+                throw new IOException("Path is a directory!");
+            }
+            if (encoding == null)
+            {
+                encoding = Encoding.UTF8;
+            }
+            return new BitStream(File.ReadAllBytes(path), encoding);
         }
 
         #endregion
@@ -319,6 +352,29 @@ namespace BitStreams
         {
             File.WriteAllBytes(filename, GetStreamData());
         }
+
+        /// <summary>
+        /// Returns the current content of the stream as a <see cref="MemoryStream"/>
+        /// </summary>
+        /// <returns><see cref="MemoryStream"/> containing current <see cref="BitStream"/> data</returns>
+        public MemoryStream CloneAsMemoryStream()
+        {
+            return new MemoryStream(GetStreamData());
+        }
+
+        /// <summary>
+        /// Returns the current content of the stream as a <see cref="BufferedStream"/>
+        /// </summary>
+        /// <returns><see cref="BufferedStream"/> containing current <see cref="BitStream"/> data</returns>
+        public BufferedStream CloneAsBufferedStream()
+        {
+            BufferedStream bs = new BufferedStream(stream);
+            StreamWriter sw = new StreamWriter(bs);
+            sw.Write(GetStreamData());
+            bs.Seek(0, SeekOrigin.Begin);
+            return bs;
+        }
+
 
         /// <summary>
         /// Checks if the <see cref="BitStream"/> will be in a valid position on its last bit read/write
@@ -1074,7 +1130,6 @@ namespace BitStreams
             Seek(offset, bit);
             Bit value = ReadBit();
             ReturnBit();
-            Seek(offset, bit);
             WriteBit(x & value);
         }
 
@@ -1091,7 +1146,6 @@ namespace BitStreams
             Seek(offset, bit);
             Bit value = ReadBit();
             ReturnBit();
-            Seek(offset, bit);
             WriteBit(x | value);
         }
 
@@ -1108,7 +1162,6 @@ namespace BitStreams
             Seek(offset, bit);
             Bit value = ReadBit();
             ReturnBit();
-            Seek(offset, bit);
             WriteBit(x ^ value);
         }
 
@@ -1124,8 +1177,23 @@ namespace BitStreams
             Seek(offset, bit);
             Bit value = ReadBit();
             ReturnBit();
-            Seek(offset, bit);
             WriteBit(~value);
+        }
+
+        /// <summary>
+        /// Reverses the bit order on the byte in the current position of the stream
+        /// </summary>
+        public void ReverseBits()
+        {
+            if (!ValidPosition)
+            {
+                throw new IOException("Cannot read in an offset bigger than the length of the stream");
+            }
+            Seek(offset, 0);
+            byte value = ReadByte();
+            offset--;
+            Seek(offset, 0);
+            WriteByte(value.ReverseBits());
         }
 
         #endregion
