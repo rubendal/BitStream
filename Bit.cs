@@ -47,12 +47,12 @@ namespace BitStreams
 
         public static Bit operator |(Bit x, Bit y)
         {
-            return x.value & y.value;
+            return x.value | y.value;
         }
 
         public static Bit operator ^(Bit x, Bit y)
         {
-            return x.value & y.value;
+            return x.value ^ y.value;
         }
 
         public static Bit operator ~(Bit bit)

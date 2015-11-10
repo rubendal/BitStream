@@ -15,6 +15,11 @@ namespace BitStreams
             return n >> index;
         }
 
+        public static Bit GetBit(this sbyte n, int index)
+        {
+            return n >> index;
+        }
+
         public static Bit GetBit(this short n, int index)
         {
             return n >> index;
@@ -58,6 +63,19 @@ namespace BitStreams
             else
             {
                 n = (byte)(n >> bits | n << (8 - bits));
+            }
+            return n;
+        }
+
+        public static sbyte CircularShift(this sbyte n, int bits, bool leftShift)
+        {
+            if (leftShift)
+            {
+                n = (sbyte)(n << bits | n >> (8 - bits));
+            }
+            else
+            {
+                n = (sbyte)(n >> bits | n << (8 - bits));
             }
             return n;
         }
@@ -138,6 +156,15 @@ namespace BitStreams
                 n = (ulong)(n >> bits | n << (64 - bits));
             }
             return n;
+        }
+
+        #endregion
+
+        #region Reverse
+
+        public static byte ReverseBits(this byte b)
+        {
+            return (byte)(((b & 1) << 7) + ((((b >> 1) & 1) << 6)) + (((b >> 2) & 1) << 5) + (((b >> 3) & 1) << 4) + (((b >> 4) & 1) << 3) +(((b >> 5) & 1) << 2) +(((b >> 6) & 1) << 1) + ((b >> 7)&1));
         }
 
         #endregion
